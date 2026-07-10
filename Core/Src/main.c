@@ -154,7 +154,7 @@ int main(void)
   int16_t pwm[4] = {0, 0, 0, 0};
   uint8_t servo[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-  int16_t don_output = 15000;
+  int16_t don_output = 8000;
   uint8_t servo_output = 95;    //(270/255)*90 =95
   int16_t fin_don_output = 0;
   uint8_t fin_servo_output = 0;
