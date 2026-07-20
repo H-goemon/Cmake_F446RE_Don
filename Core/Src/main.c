@@ -154,8 +154,8 @@ int main(void)
   int16_t pwm[4] = {0, 0, 0, 0};
   uint8_t servo[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-  int16_t don_output = 8000;
-  uint8_t servo_output = 95;    //(270/255)*90 =95
+  int16_t don_output = 15000;
+  uint8_t servo_output = 255;
   int16_t fin_don_output = 0;
   uint8_t fin_servo_output = 0;
 
@@ -163,7 +163,6 @@ int main(void)
 
   int mode = 0;
 
-  uint8_t now = 0;
   uint8_t pre = 0;
 
   while (1)
@@ -173,7 +172,7 @@ int main(void)
     // 立ち上がりエッジのみ検出する
     if(now && !pre){
       mode++;
-      if(mode > 3){
+      if(mode > 5){
         mode = 0;
       }
     }
@@ -201,24 +200,29 @@ int main(void)
         mode = 0;
         break; 
     }
-    for(int i = 0; i < 2; i++) {
-      pwm[2*i] = fin_don_output;
-      pwm[2*i+1] = -fin_don_output;
+
+    for(int i = 0; i < 4; i++) {
+      pwm[i] = fin_don_output;
     }
+
     for(int i = 0; i < 8; i++) {
       servo[i] = fin_servo_output;
     }
 
-    for(int i = 1; i <= 4; i++){
-      printf("%d\n", i);
-      CANSend(&hcan1, i, (const uint8_t *)pwm, 8);
-      CANSend(&hcan2, i, (const uint8_t *)pwm, 8);
-    }
+    CANSend(&hcan2, 4, (const uint8_t *)pwm, 8);
+    CANSend(&hcan1, 4, (const uint8_t *)pwm, 8);
+    printf("\n");
 
-    //サーボ基板への送信
-    CANSend(&hcan1, 141, servo, 8);
-    CANSend(&hcan2, 141, servo, 8);
+    // //サーボ基板への送信
+    // for(int i=0; i<10; i++){
+    //   CANSend(&hcan1, 140+i, servo, 8);
+    //   CANSend(&hcan2, 141+i, servo, 8);
+    // }
+    CANSend(&hcan1, 140, servo, 8);
+    CANSend(&hcan2, 140, servo, 8);
     
+    printf("mode=%d, don=%d, servo=%d\r\n", mode, fin_don_output, fin_servo_output);
+
     pre = now; 
     HAL_Delay(TxInterval);
 
